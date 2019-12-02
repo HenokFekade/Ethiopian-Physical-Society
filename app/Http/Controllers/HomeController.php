@@ -24,10 +24,15 @@ class HomeController extends Controller
     public function index()
     {
         if (\Gate::allows('isAdmin')) {
-            return view('admin.home');
+            $count = 1;
+            $num = 1;
+            $activeUsers = \App\User::whereType('editor')->orWhere('type', 'chief editor')->orderBy('name', 'ASC')->get();
+            $deactiveUsers = \App\User::onlyTrashed()->orderBy('name', 'ASC')->get();
+            return view('admin.home', compact('activeUsers', 'deactiveUsers', 'num', 'count'));
         }
         else {
             return view('pageNotFound');
         }
     }
+
 }

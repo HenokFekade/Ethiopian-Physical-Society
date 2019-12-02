@@ -110,7 +110,7 @@ class FieldController extends Controller
     }
 
 
-    public function fields()
+    public function returnAllFields()
     {
         if (\Gate::allows('isAdmin')) {
             $fields = Field::orderBy('name', 'ASC')->get();

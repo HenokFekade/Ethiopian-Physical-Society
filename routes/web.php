@@ -12,18 +12,28 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+   return view('welcome');
 });
 
-Route::resource('fields', 'FieldController');
+Route::resource('fields', 'FieldController')->middleware('verified');
 
-Route::post('fields/all', 'FieldController@fields');
+Route::post('fields/get', 'FieldController@returnAllFields')->middleware('verified');
 
-Route::resource('users', 'UserController');
+Route::resource('users', 'UserController')->middleware('verified');
 
-Auth::routes();
+Route::get('users/account-activate/{user}', 'UserController@activateAccount')->middleware('verified');
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('users/account-deactivate/{user}', 'UserController@deactivateAccount')->middleware('verified');
+
+Route::post('users/get-all-users', 'UserController@returnAllUsers')->middleware('verified');
+
+Route::get('account/edit', 'AccountController@edit')->middleware('verified');
+
+Route::post('account', 'AccountController@update')->middleware('verified');
+
+Auth::routes(['verify' => true]);
+
+Route::get('/home', 'HomeController@index')->name('home')->middleware('verified');
 
 
 View::composer(['welcome', 'admin.user.create', 'admin.user.edit'], function ($view) {

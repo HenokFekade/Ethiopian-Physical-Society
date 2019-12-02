@@ -37,6 +37,10 @@ const Toast = Swal.mixin({
 //register the toast as global to use it any where in your application
 window.toast = Toast;
 
+Vue.filter('capitalize',function(text) {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+})
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -50,8 +54,10 @@ window.toast = Toast;
 
 Vue.component('field-created', require('./components/admin/field/FieldCreated.vue').default);
 Vue.component('field-updated', require('./components/admin/field/FieldUpdated.vue').default);
-Vue.component('user-create', require('./components/admin/user/UserCreate.vue').default);
-Vue.component('user-edit', require('./components/admin/user/UserEdit.vue').default);
+Vue.component('account-updated', require('./components/admin/AccountUpdated.vue').default);
+Vue.component('users', require('./components/admin/user/Users.vue').default);
+Vue.component('user-deactivated', require('./components/admin/user/UserDeactivated.vue').default);
+Vue.component('user-activated', require('./components/admin/user/UserActivated.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

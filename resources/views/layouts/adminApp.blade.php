@@ -59,6 +59,13 @@
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                     
                     <li class="nav-item">
+                        <a class="nav-link" href="/home">
+                            <i class="nav-icon fas fa-home"></i>
+                            Home
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
                         <a class="nav-link" href="/users">
                             <i class="nav-icon fas fa-users"></i>
                             Users
@@ -69,6 +76,13 @@
                         <a class="nav-link" href="/fields">
                             <i class="nav-icon fas fa-plus"></i>
                             Fields
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/account/edit">
+                            <i class="nav-icon fas fa-user-edit"></i>
+                            Edit Profile
                         </a>
                     </li>
 
