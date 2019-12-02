@@ -12,6 +12,8 @@ window.Vue = require('vue');
 //import swal
 import Swal from 'sweetalert2'
 
+import VueProgressBar from 'vue-progressbar'
+
 import { Form, HasError, AlertError } from 'vform'
 
 Vue.component(HasError.name, HasError)
@@ -33,6 +35,22 @@ const Toast = Swal.mixin({
   showConfirmButton: false,
   timer: 3000
 });
+
+const options = {
+  color: '#bffaf3',
+  failedColor: '#874b4b',
+  thickness: '5px',
+  transition: {
+    speed: '0.2s',
+    opacity: '0.6s',
+    termination: 300
+  },
+  autoRevert: true,
+  location: 'top',
+  inverse: false
+}
+
+Vue.use(VueProgressBar, options)
 
 //register the toast as global to use it any where in your application
 window.toast = Toast;

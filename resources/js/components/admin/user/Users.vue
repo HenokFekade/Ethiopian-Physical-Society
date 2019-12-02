@@ -1,5 +1,6 @@
 <template>
     <div class="container mt-3">
+    <vue-progress-bar></vue-progress-bar>
         <div class="row justify-content-center">
         <div class="col-12">
           <div class="card">
@@ -10,7 +11,7 @@
                   <button class="btn btn-success" @click="ShowCreateUserModal()" >
                     Add New <i class="fas fa-user-plus fw"></i>
                   </button>
-                  
+
 
                 </div>
               </div>
@@ -52,7 +53,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Modal -->
         <div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-labelledby="userModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -117,7 +118,7 @@
                 </div>
             </div>
         </div>
-                
+
       </div>
     </div>
 </template>
@@ -145,7 +146,7 @@
                 axios.post('/users/get-all-users').then(({data}) => {
                     this.users = data;
                 }).catch((err) => {
-                    
+
                 });
             },
 
@@ -153,7 +154,7 @@
                 axios.post('/fields/get').then(({data}) => {
                     this.allFields = data;
                 }).catch((err) => {
-                    
+
                 });
             },
 
@@ -182,13 +183,15 @@
                     });
                     Fire.$emit('loadUser');
                 }).catch((err) => {
-                
+
                 });
             },
 
             editUser() {
+                this.$Progress.start()
                 this.form.put('users/' + this.form.id).then((result) => {
                     this.form.reset();
+                    this.$Progress.finish()
                     $('#userModal').modal('hide');
                     Swal.fire({
                         position: 'center',
@@ -199,7 +202,7 @@
                     });
                     Fire.$emit('loadUser');
                 }).catch((err) => {
-                    
+                    this.$Progress.fail()
                 });
             },
 
@@ -214,7 +217,9 @@
                     confirmButtonText: 'Yes, Deactivated it!'
                 }).then((result) => {
                     if (result.value) {
+                        this.$Progress.start()
                         axios.get('users/account-deactivate/' + id).then(({data}) => {
+                            this.$Progress.finish()
                             Swal.fire(
                                 'Deactivate!',
                                 'The Account Have been Deactivated.',
@@ -222,6 +227,7 @@
                             );
                             Fire.$emit('loadUser');
                         }).catch((err) => {
+                            this.$Progress.fail()
                             Swal.fire(
                                 'ERROR!',
                                 'Something Wrong. Please Retry.',
@@ -238,7 +244,7 @@
             this.loadFields();
             Fire.$on('loadUser', () => {
                 this.loadUsers();
-            })  
+            })
         }
     }
 </script>
