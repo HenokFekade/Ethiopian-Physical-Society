@@ -7,6 +7,7 @@ use App\Field;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
 use App\Mail\UserDetailMail;
+use App\Mail\UserDeactivateMail;
 use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
@@ -167,12 +168,12 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         if (\Gate::allows('isAdmin')) {
+            $this->sendDeactivationMail($user);
+            $this->updateEmailVerifiedAtColumn($user);
+            $user->delete();
             if($this->checkURL())
             {
-                $user->delete();
                 return redirect()->back();
-            } else {
-                $user->delete();
             }
         } else {
 
@@ -192,6 +193,22 @@ class UserController extends Controller
         } catch (\Throwable $e) {
             return true;
         }
+    }
+
+    public function sendDeactivationMail($user)
+    {
+        Mail::to($user->email)->send(new UserDeactivateMail($user));
+    }
+
+    public function updateEmailVerifiedAtColumn($user)
+    {
+        if (!empty($user->email_verified_at))
+        {
+            $user->forceFill([
+                'email_verified_at' => null,
+            ])->save();
+        }
+
     }
 
 
@@ -233,18 +250,17 @@ class UserController extends Controller
 
     public function activateAccount($id)
     {
-        $user = User::onlyTrashed()->findOrFail($id);
         if(\Gate::allows('isAdmin'))
         {
+            $user = User::onlyTrashed()->findOrFail($id);
+            $user->restore();
+            $this->createEventToSendEmailVerification($user);
+            $this->sendUserDetailMail($user);
             if($this->checkURL())
             {
-                $user->restore();
                 return redirect()->back();
             }
-            else
-            {
-               $user->restore();
-            }
+
         }
         else {
 
