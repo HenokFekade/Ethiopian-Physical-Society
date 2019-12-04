@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\User;
 
 class HomeController extends Controller
 {
@@ -23,14 +24,22 @@ class HomeController extends Controller
      */
     public function index()
     {
-        if (\Gate::allows('isAdmin')) {
+        if (\Gate::allows('isAdmin'))
+        {
             $count = 1;
             $num = 1;
-            $activeUsers = \App\User::whereType('editor')->orWhere('type', 'chief editor')->orderBy('name', 'ASC')->get();
-            $deactiveUsers = \App\User::onlyTrashed()->orderBy('name', 'ASC')->get();
+            $activeUsers = User::whereType('editor')->orWhere('type', 'chief editor')->orderBy('name', 'ASC')->get();
+            $deactiveUsers = User::onlyTrashed()->orderBy('name', 'ASC')->get();
             return view('admin.home', compact('activeUsers', 'deactiveUsers', 'num', 'count'));
         }
-        else {
+        else if(\Gate::allows('isEditor'))
+        {
+            $count = 1;
+            $files = auth()->user()->files;
+            return view('editor.home', compact('count', 'files'));
+        }
+        else
+        {
             return view('pageNotFound');
         }
     }

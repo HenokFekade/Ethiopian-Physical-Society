@@ -2232,38 +2232,73 @@ __webpack_require__.r(__webpack_exports__);
     createUser: function createUser() {
       var _this3 = this;
 
-      this.form.post('users').then(function (result) {
+      this.$Progress.start();
+      this.form.post('users').then(function (data) {
         _this3.form.reset();
 
         $('#userModal').modal('hide');
-        Swal.fire({
-          position: 'center',
-          icon: 'success',
-          title: 'User Added Successfuly!',
-          showConfirmButton: false,
-          timer: 1500
-        });
-        Fire.$emit('loadUser');
-      })["catch"](function (err) {});
+
+        if (data.data == "success") {
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: 'User Added Successfuly!',
+            showConfirmButton: false,
+            timer: 1500
+          });
+
+          _this3.$Progress.finish();
+
+          Fire.$emit('loadUser');
+        } else if (data.data == "error") {
+          Swal.fire({
+            position: 'center',
+            icon: 'ERROR!',
+            title: 'Something went Wrong!',
+            showConfirmButton: false,
+            timer: 1500
+          });
+
+          _this3.$Progress.fail();
+        }
+      })["catch"](function (err) {
+        _this3.$Progress.fail();
+      });
     },
     editUser: function editUser() {
       var _this4 = this;
 
       this.$Progress.start();
-      this.form.put('users/' + this.form.id).then(function (result) {
+      this.form.put('users/' + this.form.id).then(function (_ref3) {
+        var data = _ref3.data;
+
         _this4.form.reset();
 
-        _this4.$Progress.finish();
-
         $('#userModal').modal('hide');
-        Swal.fire({
-          position: 'center',
-          icon: 'success',
-          title: 'Updated Successfuly!',
-          showConfirmButton: false,
-          timer: 1500
-        });
-        Fire.$emit('loadUser');
+
+        if (data.data == "success") {
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: 'Updated Successfuly!',
+            showConfirmButton: false,
+            timer: 1500
+          });
+
+          _this4.$Progress.finish();
+
+          Fire.$emit('loadUser');
+        } else if (data.data == "error") {
+          Swal.fire({
+            position: 'center',
+            icon: 'ERROR!',
+            title: 'Something went Wrong!',
+            showConfirmButton: false,
+            timer: 1500
+          });
+
+          _this4.$Progress.fail();
+        }
       })["catch"](function (err) {
         _this4.$Progress.fail();
       });
@@ -2283,13 +2318,20 @@ __webpack_require__.r(__webpack_exports__);
         if (result.value) {
           _this5.$Progress.start();
 
-          axios.get('users/account-deactivate/' + id).then(function (_ref3) {
-            var data = _ref3.data;
+          axios.get('users/account-deactivate/' + id).then(function (_ref4) {
+            var data = _ref4.data;
 
-            _this5.$Progress.finish();
+            if (data.data == "success") {
+              Swal.fire('Deactivate!', 'The Account Have been Deactivated.', 'success');
 
-            Swal.fire('Deactivate!', 'The Account Have been Deactivated.', 'success');
-            Fire.$emit('loadUser');
+              _this5.$Progress.finish();
+
+              Fire.$emit('loadUser');
+            } else if (data.data == "error") {
+              Swal.fire('ERROR!', 'Something Wrong. Please Retry.', 'success');
+
+              _this5.$Progress.fail();
+            }
           })["catch"](function (err) {
             _this5.$Progress.fail();
 
@@ -54504,7 +54546,7 @@ var Toast = sweetalert2__WEBPACK_IMPORTED_MODULE_0___default.a.mixin({
 var options = {
   color: '#bffaf3',
   failedColor: '#874b4b',
-  thickness: '5px',
+  thickness: '8px',
   transition: {
     speed: '0.2s',
     opacity: '0.6s',

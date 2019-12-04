@@ -171,36 +171,64 @@
             },
 
             createUser() {
-                this.form.post('users').then((result) => {
+                this.$Progress.start();
+                this.form.post('users').then((data) => {
                     this.form.reset();
                     $('#userModal').modal('hide');
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'User Added Successfuly!',
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                    Fire.$emit('loadUser');
+                    if (data.data == "success") {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'User Added Successfuly!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        this.$Progress.finish();
+                        Fire.$emit('loadUser');
+                    }
+                    else if (data.data == "error") {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'ERROR!',
+                            title: 'Something went Wrong!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        this.$Progress.fail();
+                    }
                 }).catch((err) => {
-
+                    this.$Progress.fail();
                 });
+
             },
 
             editUser() {
                 this.$Progress.start()
-                this.form.put('users/' + this.form.id).then((result) => {
+                this.form.put('users/' + this.form.id).then(({data}) => {
                     this.form.reset();
-                    this.$Progress.finish()
                     $('#userModal').modal('hide');
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Updated Successfuly!',
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                    Fire.$emit('loadUser');
+                    if (data.data == "success") {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Updated Successfuly!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        this.$Progress.finish()
+                        Fire.$emit('loadUser');
+                    }
+                    else if (data.data == "error") {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'ERROR!',
+                            title: 'Something went Wrong!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        this.$Progress.fail()
+                    }
+
                 }).catch((err) => {
                     this.$Progress.fail()
                 });
@@ -219,13 +247,26 @@
                     if (result.value) {
                         this.$Progress.start()
                         axios.get('users/account-deactivate/' + id).then(({data}) => {
-                            this.$Progress.finish()
-                            Swal.fire(
-                                'Deactivate!',
-                                'The Account Have been Deactivated.',
-                                'success'
-                            );
-                            Fire.$emit('loadUser');
+                            if(data.data == "success")
+                            {
+                                Swal.fire(
+                                    'Deactivate!',
+                                    'The Account Have been Deactivated.',
+                                    'success'
+                                );
+                                this.$Progress.finish()
+                                Fire.$emit('loadUser');
+                            }
+                            else if (data.data == "error")
+                            {
+                                Swal.fire(
+                                    'ERROR!',
+                                    'Something Wrong. Please Retry.',
+                                    'success'
+                                );
+                                this.$Progress.fail()
+                            }
+
                         }).catch((err) => {
                             this.$Progress.fail()
                             Swal.fire(

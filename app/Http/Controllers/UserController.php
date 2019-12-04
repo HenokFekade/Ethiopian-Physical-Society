@@ -9,6 +9,7 @@ use Illuminate\Auth\Events\Registered;
 use App\Mail\UserDetailMail;
 use App\Mail\UserDeactivateMail;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -44,19 +45,27 @@ class UserController extends Controller
     {
         if (\Gate::allows('isAdmin')) {
             $this->createValidater($request);
-            $user = User::create([
-                'name' => strtolower($request->name),
-                'email' => $request->email,
-                'type' => strtolower($request->type),
-                'password' => \Hash::make($request['password']),
-            ]);
-            if ($request->type == 'editor') {
+            DB::beginTransaction();
+            try {
+                $user = User::create([
+                    'name' => strtolower($request->name),
+                    'email' => $request->email,
+                    'type' => strtolower($request->type),
+                    'password' => \Hash::make($request['password']),
+                ]);
+                if ($request->type == 'editor') {
 
-                $this->attachFieldToUser($request->fields, $user);
+                    $this->attachFieldToUser($request->fields, $user);
+                }
+                $this->createEventToSendEmailVerification($user);
+                $this->sendUserDetailMail($request);
+                DB::commit();
+                return "success";
+            } catch (\Exception $e) {
+                DB::rollback();
+                return 'error';
             }
-            $this->createEventToSendEmailVerification($user);
-            $this->sendUserDetailMail($request);
-            return "success";
+
 
         } else {
             return view('pageNotFound');
@@ -116,20 +125,30 @@ class UserController extends Controller
     {
         if (\Gate::allows('isAdmin')) {
             $this->updateValidater($request, $user);
-            $user->update([
-                'name' => $request->name,
-                'email' => $request->email,
-                'type' => strtolower($request->type),
-            ]);
-            if (!empty($request->password)) {
+            DB::beginTransaction();
+            try {
                 $user->update([
-                    'password' => \Hash::make($request->password),
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'type' => strtolower($request->type),
                 ]);
+                if (!empty($request->password)) {
+                    $user->update([
+                        'password' => \Hash::make($request->password),
+                    ]);
+                }
+
+                if ($request->type == 'editor') {
+                    $this->attachFieldToUser($request->fields, $user);
+                }
+                DB::commit();
+                return "success";
+            } catch (\Exception $e) {
+                DB::rollback();
+                return "error";
             }
 
-            if ($request->type == 'editor') {
-                $this->attachFieldToUser($request->fields, $user);
-            }
+
         } else {
 
         }
@@ -168,13 +187,31 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         if (\Gate::allows('isAdmin')) {
-            $this->sendDeactivationMail($user);
-            $this->updateEmailVerifiedAtColumn($user);
-            $user->delete();
-            if($this->checkURL())
-            {
-                return redirect()->back();
+            try {
+                DB::beginTransaction();
+                $this->sendDeactivationMail($user);
+                $this->updateEmailVerifiedAtColumn($user);
+                $user->delete();
+                DB::commit();
+                if($this->checkURL())
+                {
+                    return redirect()->back()->with('success', 'Successfuly deactivated');
+                }
+                else {
+                    return "success";
+                }
+            } catch (\Exception $e) {
+                DB::rollback();
+                if($this->checkURL())
+                {
+                    return redirect()->back()->with('error', 'not deactivated');
+                }
+                else {
+                    return "error";
+                }
             }
+
+
         } else {
 
         }
@@ -253,12 +290,21 @@ class UserController extends Controller
         if(\Gate::allows('isAdmin'))
         {
             $user = User::onlyTrashed()->findOrFail($id);
-            $user->restore();
-            $this->createEventToSendEmailVerification($user);
-            $this->sendUserDetailMail($user);
-            if($this->checkURL())
-            {
-                return redirect()->back();
+            try {
+                $user->restore();
+                $this->createEventToSendEmailVerification($user);
+                $this->sendUserDetailMail($user);
+                if($this->checkURL())
+                {
+                    return redirect()->back()->with('success', 'Successfuly activated');
+                }
+                return 'success';
+            } catch (\Exception $e) {
+                if($this->checkURL())
+                {
+                    return redirect()->back()->with('error', 'not activated');
+                }
+                return 'error';
             }
 
         }

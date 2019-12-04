@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Field;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class FieldController extends Controller
 {
@@ -25,7 +26,7 @@ class FieldController extends Controller
         } else {
             return view('pageNotFound');
         }
-        
+
     }
 
     /**
@@ -40,7 +41,7 @@ class FieldController extends Controller
         } else {
             return view('pageNotFound');
         }
-        
+
     }
 
     /**
@@ -53,20 +54,28 @@ class FieldController extends Controller
     {
         if (\Gate::allows('isAdmin')) {
             $this->validater($request);
-            Field::create([
-                'name' => strtolower($request->name),
-            ]);
+            DB::beginTransaction();
+            try {
+                Field::create([
+                    'name' => strtolower($request->name),
+                ]);
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+            }
+
+
             return redirect('/fields')->with('status', 'field created');
         } else {
             return view('pageNotFound');
         }
-        
+
     }
 
     public function validater($data)
     {
         $this->validate($data, [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:fields',
         ]);
     }
 
@@ -84,7 +93,7 @@ class FieldController extends Controller
         } else {
             return view('pageNotFound');
         }
-        
+
     }
 
     /**
@@ -98,12 +107,17 @@ class FieldController extends Controller
     {
         if (\Gate::allows('isAdmin')) {
             $this->validater($request);
-    
-            $field->update([
-                'name' => strtolower($request->name),
-            ]);
+            DB::beginTransaction();
+            try {
+                $field->update([
+                    'name' => strtolower($request->name),
+                ]);
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+            }
             return redirect('/fields')->with('status', 'field updated');
-            
+
         } else {
             return view('pageNotFound');
         }
@@ -118,6 +132,6 @@ class FieldController extends Controller
         } else {
             return view('pageNotFound');
         }
-        
+
     }
 }

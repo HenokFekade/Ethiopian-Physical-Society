@@ -106,7 +106,8 @@
                                 </div>
                             </section>
                         @else
-                            <div class=" text-red text-bold text-center mt-5 mb-3 ">
+                            
+                            <div class="offset-5 text-red text-bold text-center mt-5 mb-3 ">
                                     No Deactivate User Found!
                             </div>
                         @endif
