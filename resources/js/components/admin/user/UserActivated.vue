@@ -1,7 +1,8 @@
 <template>
     <div class="container">
+        <vue-progress-bar></vue-progress-bar>
          <a href="#" @click="accountActivate()" class="text-seccess" >
-            activate 
+            activate
             <i class="fas fa-lock-open"></i>
         </a>
     </div>
@@ -30,17 +31,31 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.value) {
-                        axios.get('/users/account-activate/' + this.userId).then(({data}) => {
-                            swalWithBootstrapButtons.fire(
-                                'Activated!',
-                                'User Account Activated.',
-                                'success'
-                            )
-                            window.location = "/home";
+                        this.$Progress.start()
+                        axios.get('/account/account-activate/' + this.userId).then(({data}) => {
+                            if (data == "success") {
+                                swalWithBootstrapButtons.fire(
+                                    'Activated!',
+                                    'User Account Activated.',
+                                    'success'
+                                )
+                                this.$Progress.finish();
+                                window.location = "/home";
+                            }
+                            else if(data == "error") {
+                                this.$Progress.fail();
+                                swalWithBootstrapButtons.fire(
+                                    'ERROR!',
+                                    'User Account Can\'t Activated! Please retry!',
+                                    'error'
+                                )
+
+                            }
                         }).catch((err) => {
+                            this.$Progress.fail();
                             swalWithBootstrapButtons.fire(
-                                'Cancelled',
-                                'User Account Can\'t Activated!',
+                                'ERROR!',
+                                'User Account Can\'t Activated! Please retry',
                                 'error'
                             )
                         })
@@ -48,16 +63,17 @@
                         result.dismiss === Swal.DismissReason.cancel
                     ) {
                         swalWithBootstrapButtons.fire(
-                            'Cancelled',
+                            'ERROR!',
                             'User Account Not Activated!',
                             'error'
                         )
+                        this.$Progress.fail();
                     }
                     })
             }
         },
         mounted() {
-            
+
         }
     }
 </script>

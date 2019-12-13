@@ -12,6 +12,11 @@
                     <div class="card-header">
                         <h3 class="card-title">Edit Account</h3>
                     </div>
+                    @if(session('status') == 'something went wrong')
+                        <div class="alert alert-danger" role="alert">
+                            Fail to update your Account. Please retry again.
+                        </div>
+                    @endif
                     {!! Form::open(['action' => ['AccountController@update', auth()->user()->id], 'method' => 'POST']) !!}
                         <div class="card-body">
                             <div class="form-group">

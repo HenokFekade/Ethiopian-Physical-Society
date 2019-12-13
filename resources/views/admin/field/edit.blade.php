@@ -13,6 +13,11 @@
                 <div class="card-header">
                     <h3 class="card-title">Edit Field</h3>
                 </div>
+                @if(session('status') == 'error')
+                    <div class="alert alert-danger" role="alert">
+                        Fail to update the Field. Please retry again.
+                    </div>
+                @endif
                 <!-- /.card-header -->
                 {!! Form::open(['action' => ['FieldController@update', $field->id], 'method' => 'PATCH']) !!}
                     <div class="card-body">

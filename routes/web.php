@@ -21,9 +21,9 @@ Route::post('fields/get', 'FieldController@returnAllFields')->middleware('verifi
 
 Route::resource('users', 'UserController')->middleware('verified');
 
-Route::get('users/account-activate/{user}', 'UserController@activateAccount')->middleware('verified');
+Route::get('account/account-activate/{user}', 'AccountController@activateAccount')->middleware('verified');
 
-Route::get('users/account-deactivate/{user}', 'UserController@deactivateAccount')->middleware('verified');
+Route::get('account/account-deactivate/{user}', 'AccountController@deactivateAccount')->middleware('verified');
 
 Route::post('users/get-all-users', 'UserController@returnAllUsers')->middleware('verified');
 

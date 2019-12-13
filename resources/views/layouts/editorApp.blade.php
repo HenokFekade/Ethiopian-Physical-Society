@@ -100,16 +100,6 @@
             <!-- /.control-sidebar -->
             @yield('script')
         </div>
-
-        {{-- <script>
-            function profileController() {
-                if(window.location.pathname == "/fields/create")
-                {
-                    document.getElementById('user-profile').src = "../img/profile/user.png";
-                }
-            }
-        </script> --}}
-
     </body>
     </html>
 

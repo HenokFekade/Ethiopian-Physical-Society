@@ -60,12 +60,14 @@ class FieldController extends Controller
                     'name' => strtolower($request->name),
                 ]);
                 DB::commit();
+                return redirect('/fields')->with('status', 'field created');
             } catch (\Exception $e) {
                 DB::rollBack();
+                return back()->with('status', 'error');
             }
 
 
-            return redirect('/fields')->with('status', 'field created');
+
         } else {
             return view('pageNotFound');
         }
@@ -113,10 +115,12 @@ class FieldController extends Controller
                     'name' => strtolower($request->name),
                 ]);
                 DB::commit();
+                return redirect('/fields')->with('status', 'field updated');
             } catch (\Exception $e) {
                 DB::rollBack();
+                return back()->with('status', 'error');
             }
-            return redirect('/fields')->with('status', 'field updated');
+
 
         } else {
             return view('pageNotFound');

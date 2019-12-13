@@ -1952,6 +1952,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['userId'],
   methods: {
@@ -1975,15 +1976,31 @@ __webpack_require__.r(__webpack_exports__);
         reverseButtons: true
       }).then(function (result) {
         if (result.value) {
-          axios.get('/users/account-activate/' + _this.userId).then(function (_ref) {
+          _this.$Progress.start();
+
+          axios.get('/account/account-activate/' + _this.userId).then(function (_ref) {
             var data = _ref.data;
-            swalWithBootstrapButtons.fire('Activated!', 'User Account Activated.', 'success');
-            window.location = "/home";
+
+            if (data == "success") {
+              swalWithBootstrapButtons.fire('Activated!', 'User Account Activated.', 'success');
+
+              _this.$Progress.finish();
+
+              window.location = "/home";
+            } else if (data == "error") {
+              _this.$Progress.fail();
+
+              swalWithBootstrapButtons.fire('ERROR!', 'User Account Can\'t Activated! Please retry!', 'error');
+            }
           })["catch"](function (err) {
-            swalWithBootstrapButtons.fire('Cancelled', 'User Account Can\'t Activated!', 'error');
+            _this.$Progress.fail();
+
+            swalWithBootstrapButtons.fire('ERROR!', 'User Account Can\'t Activated! Please retry', 'error');
           });
         } else if (result.dismiss === Swal.DismissReason.cancel) {
-          swalWithBootstrapButtons.fire('Cancelled', 'User Account Not Activated!', 'error');
+          swalWithBootstrapButtons.fire('ERROR!', 'User Account Not Activated!', 'error');
+
+          _this.$Progress.fail();
         }
       });
     }
@@ -2011,6 +2028,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['userId'],
   methods: {
@@ -2029,17 +2047,31 @@ __webpack_require__.r(__webpack_exports__);
         text: "Do You Want to Deactivate The Account You Have Seleced?",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Yes, Deactivate it!',
+        confirmButtonText: 'Yes, Deactivate!',
         cancelButtonText: 'No, cancel!',
         reverseButtons: true
       }).then(function (result) {
         if (result.value) {
-          axios.get('/users/account-deactivate/' + _this.userId).then(function (_ref) {
+          _this.$Progress.start();
+
+          axios.get('/account/account-deactivate/' + _this.userId).then(function (_ref) {
             var data = _ref.data;
-            swalWithBootstrapButtons.fire('Activated!', 'User Account Deactivated.', 'success');
-            window.location = "/home";
+
+            if (data == "success") {
+              swalWithBootstrapButtons.fire('Deactivated!', 'User Account Deactivated.', 'success');
+
+              _this.$Progress.finish();
+
+              window.location = "/home";
+            } else if (data == "error") {
+              swalWithBootstrapButtons.fire('Cancelled', 'User Account Can\'t Deactivated! Something went wrong!', 'error');
+
+              _this.$Progress.fail();
+            }
           })["catch"](function (err) {
-            swalWithBootstrapButtons.fire('Cancelled', 'User Account Can\'t Deactivated!', 'error');
+            swalWithBootstrapButtons.fire('Cancelled', 'User Account Can\'t Deactivated! Something went wrong!', 'error');
+
+            _this.$Progress.fail();
           });
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           swalWithBootstrapButtons.fire('Cancelled', 'User Account Not Deactivated!', 'error');
@@ -2189,7 +2221,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      allFields: {},
+      fields: {},
       editable: false,
       users: {},
       form: new Form({
@@ -2216,7 +2248,7 @@ __webpack_require__.r(__webpack_exports__);
 
       axios.post('/fields/get').then(function (_ref2) {
         var data = _ref2.data;
-        _this2.allFields = data;
+        _this2.fields = data;
       })["catch"](function (err) {});
     },
     ShowCreateUserModal: function ShowCreateUserModal() {
@@ -2238,7 +2270,7 @@ __webpack_require__.r(__webpack_exports__);
 
         $('#userModal').modal('hide');
 
-        if (data.data == "success") {
+        if (data == "success") {
           Swal.fire({
             position: 'center',
             icon: 'success',
@@ -2250,11 +2282,11 @@ __webpack_require__.r(__webpack_exports__);
           _this3.$Progress.finish();
 
           Fire.$emit('loadUser');
-        } else if (data.data == "error") {
+        } else if (data == "error") {
           Swal.fire({
             position: 'center',
-            icon: 'ERROR!',
-            title: 'Something went Wrong!',
+            icon: 'error',
+            title: 'User not Add. Because Something went Wrong!',
             showConfirmButton: false,
             timer: 1500
           });
@@ -2262,6 +2294,14 @@ __webpack_require__.r(__webpack_exports__);
           _this3.$Progress.fail();
         }
       })["catch"](function (err) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'User not Add.Because Something went Wrong!',
+          showConfirmButton: false,
+          timer: 1500
+        });
+
         _this3.$Progress.fail();
       });
     },
@@ -2276,7 +2316,7 @@ __webpack_require__.r(__webpack_exports__);
 
         $('#userModal').modal('hide');
 
-        if (data.data == "success") {
+        if (data == "success") {
           Swal.fire({
             position: 'center',
             icon: 'success',
@@ -2288,11 +2328,11 @@ __webpack_require__.r(__webpack_exports__);
           _this4.$Progress.finish();
 
           Fire.$emit('loadUser');
-        } else if (data.data == "error") {
+        } else if (data == "error") {
           Swal.fire({
             position: 'center',
-            icon: 'ERROR!',
-            title: 'Something went Wrong!',
+            icon: 'error',
+            title: 'User not Updated. Because Something went Wrong!',
             showConfirmButton: false,
             timer: 1500
           });
@@ -2300,6 +2340,15 @@ __webpack_require__.r(__webpack_exports__);
           _this4.$Progress.fail();
         }
       })["catch"](function (err) {
+        console.log(status);
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'User not Updated. Because Something went Wrong!',
+          showConfirmButton: false,
+          timer: 1500
+        });
+
         _this4.$Progress.fail();
       });
     },
@@ -2318,24 +2367,24 @@ __webpack_require__.r(__webpack_exports__);
         if (result.value) {
           _this5.$Progress.start();
 
-          axios.get('users/account-deactivate/' + id).then(function (_ref4) {
+          axios.get('account/account-deactivate/' + id).then(function (_ref4) {
             var data = _ref4.data;
 
-            if (data.data == "success") {
+            if (data == "success") {
               Swal.fire('Deactivate!', 'The Account Have been Deactivated.', 'success');
 
               _this5.$Progress.finish();
 
               Fire.$emit('loadUser');
-            } else if (data.data == "error") {
-              Swal.fire('ERROR!', 'Something Wrong. Please Retry.', 'success');
+            } else if (data == "error") {
+              Swal.fire('error', 'Something Wrong. Please Retry.', 'success');
 
               _this5.$Progress.fail();
             }
           })["catch"](function (err) {
             _this5.$Progress.fail();
 
-            Swal.fire('ERROR!', 'Something Wrong. Please Retry.', 'success');
+            Swal.fire('error', 'Something Wrong. Please Retry.', 'success');
           });
         }
       });
@@ -41754,24 +41803,31 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "container" }, [
-    _c(
-      "a",
-      {
-        staticClass: "text-seccess",
-        attrs: { href: "#" },
-        on: {
-          click: function($event) {
-            return _vm.accountActivate()
+  return _c(
+    "div",
+    { staticClass: "container" },
+    [
+      _c("vue-progress-bar"),
+      _vm._v(" "),
+      _c(
+        "a",
+        {
+          staticClass: "text-seccess",
+          attrs: { href: "#" },
+          on: {
+            click: function($event) {
+              return _vm.accountActivate()
+            }
           }
-        }
-      },
-      [
-        _vm._v("\n        activate \n        "),
-        _c("i", { staticClass: "fas fa-lock-open" })
-      ]
-    )
-  ])
+        },
+        [
+          _vm._v("\n        activate\n        "),
+          _c("i", { staticClass: "fas fa-lock-open" })
+        ]
+      )
+    ],
+    1
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -41795,24 +41851,31 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "container" }, [
-    _c(
-      "a",
-      {
-        staticClass: "text-danger",
-        attrs: { href: "#" },
-        on: {
-          click: function($event) {
-            return _vm.accountActivate()
+  return _c(
+    "div",
+    { staticClass: "container" },
+    [
+      _c("vue-progress-bar"),
+      _vm._v(" "),
+      _c(
+        "a",
+        {
+          staticClass: "text-danger",
+          attrs: { href: "#" },
+          on: {
+            click: function($event) {
+              return _vm.accountActivate()
+            }
           }
-        }
-      },
-      [
-        _vm._v("\n        deactivate \n        "),
-        _c("i", { staticClass: "fas fa-lock" })
-      ]
-    )
-  ])
+        },
+        [
+          _vm._v("\n        deactivate\n        "),
+          _c("i", { staticClass: "fas fa-lock" })
+        ]
+      )
+    ],
+    1
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -41916,7 +41979,7 @@ var render = function() {
                               }
                             },
                             [
-                              _vm._v("edit "),
+                              _vm._v("edit"),
                               _c("i", { staticClass: "fas fa-edit" })
                             ]
                           ),
@@ -41935,7 +41998,7 @@ var render = function() {
                               }
                             },
                             [
-                              _vm._v("deactivate "),
+                              _vm._v("deactivate"),
                               _c("i", { staticClass: "fas fa-lock" })
                             ]
                           )
@@ -42162,7 +42225,7 @@ var render = function() {
                           _c("br"),
                           _vm._v(" "),
                           _c("label", { staticClass: "text-danger" }, [
-                            _vm._v("Note: need only if it is editor ")
+                            _vm._v("Note: this is required only for editors ")
                           ]),
                           _vm._v(" "),
                           _c(
@@ -42203,7 +42266,7 @@ var render = function() {
                                 }
                               }
                             },
-                            _vm._l(_vm.allFields, function(field) {
+                            _vm._l(_vm.fields, function(field) {
                               return _c(
                                 "option",
                                 {

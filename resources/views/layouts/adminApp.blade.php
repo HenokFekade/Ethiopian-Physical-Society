@@ -13,7 +13,7 @@
         <!-- Scripts -->
         <script src="{{ asset('js/app.js') }}" defer></script>
 
-    
+
         <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     </head>
     <body class="hold-transition sidebar-mini layout-fixed" >
@@ -26,7 +26,7 @@
                 <li class="nav-item">
                     <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
                 </li>
-                
+
                 </ul>
             </nav>
             <!-- /.navbar -->
@@ -57,7 +57,7 @@
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                    
+
                     <li class="nav-item">
                         <a class="nav-link" href="/home">
                             <i class="nav-icon fas fa-home"></i>
@@ -98,7 +98,7 @@
                             @csrf
                         </form>
                     </li>
-                    
+
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->
@@ -107,7 +107,7 @@
             </aside>
 
             @yield('content')
-            
+
             <footer class="main-footer">
                 <strong>Copyright &copy; 2014-2019 <a >{{ config('app.name') }}</a>.</strong>
                 All rights reserved.
@@ -120,15 +120,6 @@
             <!-- /.control-sidebar -->
             @yield('script')
         </div>
-
-        {{-- <script>
-            function profileController() {
-                if(window.location.pathname == "/fields/create")
-                {
-                    document.getElementById('user-profile').src = "../img/profile/user.png";
-                }
-            }
-        </script> --}}
 
     </body>
     </html>

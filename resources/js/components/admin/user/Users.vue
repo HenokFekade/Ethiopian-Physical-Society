@@ -39,9 +39,9 @@
                         </ul>
                       </td>
                       <td >
-                        <a href="#" @click="ShowEdetUserModal(user)" class="text-primary" >edit <i class="fas fa-edit"></i> </a>
+                        <a href="#" @click="ShowEdetUserModal(user)" class="text-primary">edit<i class="fas fa-edit"></i> </a>
                         /
-                        <a href="#" @click="deactivateUser(user.id)" class="text-danger" >deactivate <i class="fas fa-lock"></i></a>
+                        <a href="#" @click="deactivateUser(user.id)" class="text-danger">deactivate<i class="fas fa-lock"></i></a>
                       </td>
                     </tr>
                   </tbody>
@@ -93,10 +93,10 @@
 
                             <div class="form-group">
                                 <label>Fields</label><br>
-                                <label class="text-danger">Note: need only if it is editor </label>
+                                <label class="text-danger">Note: this is required only for editors </label>
                                 <select multiple class="custom-select my-1 mr-sm-2 form-control" v-model="form.fields"  name="fields"
                                      :class="{ 'is-invalid': form.errors.has('fields') }">
-                                    <option  v-for="field in allFields" ::key="field.id" :value="field.name">{{ field.name }}</option>
+                                    <option  v-for="field in fields" ::key="field.id" :value="field.name">{{ field.name }}</option>
                                 </select>
                                 <has-error :form="form" field="fields"></has-error>
                             </div>
@@ -127,7 +127,7 @@
     export default {
         data() {
             return {
-                allFields: {},
+                fields: {},
                 editable: false,
                 users: {},
                 form: new Form({
@@ -152,7 +152,7 @@
 
             loadFields() {
                 axios.post('/fields/get').then(({data}) => {
-                    this.allFields = data;
+                    this.fields = data;
                 }).catch((err) => {
 
                 });
@@ -175,7 +175,7 @@
                 this.form.post('users').then((data) => {
                     this.form.reset();
                     $('#userModal').modal('hide');
-                    if (data.data == "success") {
+                    if (data == "success") {
                         Swal.fire({
                             position: 'center',
                             icon: 'success',
@@ -186,17 +186,24 @@
                         this.$Progress.finish();
                         Fire.$emit('loadUser');
                     }
-                    else if (data.data == "error") {
+                    else if (data == "error") {
                         Swal.fire({
                             position: 'center',
-                            icon: 'ERROR!',
-                            title: 'Something went Wrong!',
+                            icon: 'error',
+                            title: 'User not Add. Because Something went Wrong!',
                             showConfirmButton: false,
                             timer: 1500
                         });
                         this.$Progress.fail();
                     }
                 }).catch((err) => {
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'error',
+                        title: 'User not Add.Because Something went Wrong!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
                     this.$Progress.fail();
                 });
 
@@ -207,7 +214,7 @@
                 this.form.put('users/' + this.form.id).then(({data}) => {
                     this.form.reset();
                     $('#userModal').modal('hide');
-                    if (data.data == "success") {
+                    if (data == "success") {
                         Swal.fire({
                             position: 'center',
                             icon: 'success',
@@ -218,11 +225,11 @@
                         this.$Progress.finish()
                         Fire.$emit('loadUser');
                     }
-                    else if (data.data == "error") {
+                    else if (data == "error") {
                         Swal.fire({
                             position: 'center',
-                            icon: 'ERROR!',
-                            title: 'Something went Wrong!',
+                            icon: 'error',
+                            title: 'User not Updated. Because Something went Wrong!',
                             showConfirmButton: false,
                             timer: 1500
                         });
@@ -230,6 +237,14 @@
                     }
 
                 }).catch((err) => {
+                    console.log(status);
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'error',
+                        title: 'User not Updated. Because Something went Wrong!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
                     this.$Progress.fail()
                 });
             },
@@ -246,8 +261,8 @@
                 }).then((result) => {
                     if (result.value) {
                         this.$Progress.start()
-                        axios.get('users/account-deactivate/' + id).then(({data}) => {
-                            if(data.data == "success")
+                        axios.get('account/account-deactivate/' + id).then(({data}) => {
+                            if(data == "success")
                             {
                                 Swal.fire(
                                     'Deactivate!',
@@ -257,10 +272,10 @@
                                 this.$Progress.finish()
                                 Fire.$emit('loadUser');
                             }
-                            else if (data.data == "error")
+                            else if (data == "error")
                             {
                                 Swal.fire(
-                                    'ERROR!',
+                                    'error',
                                     'Something Wrong. Please Retry.',
                                     'success'
                                 );
@@ -270,7 +285,7 @@
                         }).catch((err) => {
                             this.$Progress.fail()
                             Swal.fire(
-                                'ERROR!',
+                                'error',
                                 'Something Wrong. Please Retry.',
                                 'success'
                             );

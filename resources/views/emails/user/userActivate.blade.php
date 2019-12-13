@@ -1,11 +1,8 @@
 @component('mail::message')
 # Introduction
 
-The body of your message.
+Dear {{ucwords($user->name)}}, your account is activated.
 
-@component('mail::button', ['url' => ''])
-Button Text
-@endcomponent
 
 Thanks,<br>
 {{ config('app.name') }}

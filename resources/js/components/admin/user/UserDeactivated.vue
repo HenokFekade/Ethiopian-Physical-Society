@@ -1,7 +1,8 @@
 <template>
     <div class="container">
+        <vue-progress-bar></vue-progress-bar>
          <a href="#" @click="accountActivate()" class="text-danger" >
-            deactivate 
+            deactivate
             <i class="fas fa-lock"></i>
         </a>
     </div>
@@ -25,24 +26,38 @@
                     text: "Do You Want to Deactivate The Account You Have Seleced?",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: 'Yes, Deactivate it!',
+                    confirmButtonText: 'Yes, Deactivate!',
                     cancelButtonText: 'No, cancel!',
                     reverseButtons: true
                 }).then((result) => {
                     if (result.value) {
-                        axios.get('/users/account-deactivate/' + this.userId).then(({data}) => {
-                            swalWithBootstrapButtons.fire(
-                                'Activated!',
-                                'User Account Deactivated.',
-                                'success'
-                            )
-                            window.location = "/home";
+                        this.$Progress.start()
+                        axios.get('/account/account-deactivate/' + this.userId).then(({data}) => {
+                            if (data == "success") {
+                                swalWithBootstrapButtons.fire(
+                                    'Deactivated!',
+                                    'User Account Deactivated.',
+                                    'success'
+                                )
+                                this.$Progress.finish()
+                                window.location = "/home";
+                            }
+                            else if (data == "error") {
+                                swalWithBootstrapButtons.fire(
+                                    'Cancelled',
+                                    'User Account Can\'t Deactivated! Something went wrong!',
+                                    'error'
+                                )
+                                this.$Progress.fail()
+                            }
+
                         }).catch((err) => {
                             swalWithBootstrapButtons.fire(
                                 'Cancelled',
-                                'User Account Can\'t Deactivated!',
+                                'User Account Can\'t Deactivated! Something went wrong!',
                                 'error'
                             )
+                            this.$Progress.fail()
                         })
                     } else if (
                         result.dismiss === Swal.DismissReason.cancel
@@ -57,7 +72,7 @@
             }
         },
         mounted() {
-            
+
         }
     }
 </script>

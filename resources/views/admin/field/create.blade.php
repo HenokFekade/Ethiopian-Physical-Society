@@ -13,6 +13,11 @@
                 <div class="card-header">
                     <h3 class="card-title">Add Field</h3>
                 </div>
+                @if(session('status') == 'error')
+                    <div class="alert alert-danger" role="alert">
+                        Fail to Add the Field to database. Please retry again.
+                    </div>
+                @endif
                 <!-- /.card-header -->
                 {!! Form::open(['action' => 'FieldController@store', 'method' => 'POST']) !!}
                     <div class="card-body">

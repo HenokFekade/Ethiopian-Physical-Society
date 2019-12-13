@@ -7,7 +7,6 @@ use App\Field;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
 use App\Mail\UserDetailMail;
-use App\Mail\UserDeactivateMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 
@@ -74,28 +73,29 @@ class UserController extends Controller
 
     public function createValidater($data)
     {
+        $this->validate($data, [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|string|max:255|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
         if ($data->type == 'editor') {
             $this->validate($data, [
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|string|max:255|unique:users',
                 'fields' => 'required',
-                'password' => 'required|string|min:8',
-            ]);
-        } else {
-            $this->validate($data, [
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|string|max:255|unique:users',
-                'password' => 'required|string|min:8',
             ]);
         }
-
     }
 
     public function attachFieldToUser($fields, $user)
     {
-        foreach ($fields as $field) {
-            $user->fields()->attach($this->findFieldId($field));
+        try {
+            foreach ($fields as $field) {
+                $user->fields()->attach($this->findFieldId($field));
+            }
+        } catch (\Exception $e) {
+
         }
+
+
     }
 
     public function findFieldId($field)
@@ -126,7 +126,8 @@ class UserController extends Controller
         if (\Gate::allows('isAdmin')) {
             $this->updateValidater($request, $user);
             DB::beginTransaction();
-            try {
+
+                $oldEmail = $user->email;
                 $user->update([
                     'name' => $request->name,
                     'email' => $request->email,
@@ -141,12 +142,17 @@ class UserController extends Controller
                 if ($request->type == 'editor') {
                     $this->attachFieldToUser($request->fields, $user);
                 }
+                if($request->email != $oldEmail)
+                {
+                    $this->updateEmailVerifiedAtColumn($user);
+                    $this->createEventToSendEmailVerification($user);
+                    $this->sendUserDetailMail($request);
+                }
                 DB::commit();
                 return "success";
-            } catch (\Exception $e) {
-                DB::rollback();
-                return "error";
-            }
+
+
+
 
 
         } else {
@@ -156,19 +162,15 @@ class UserController extends Controller
 
     public function updateValidater($data, $user)
     {
+        $this->validate($data, [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
+        ]);
         if ($data->type == 'editor') {
             $this->validate($data, [
-                'name' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
                 'fields' => 'required',
             ]);
-        } else {
-            $this->validate($data, [
-                'name' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
-            ]);
         }
-
         if (!empty($data->password)) {
             $this->validate($data, [
                 'password' => 'required|string|min:8',
@@ -177,45 +179,7 @@ class UserController extends Controller
 
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\User  $user
-     * @return \Illuminate\Http\Response
-     */
-    public function deactivateAccount($id)
-    {
-        $user = User::findOrFail($id);
-        if (\Gate::allows('isAdmin')) {
-            try {
-                DB::beginTransaction();
-                $this->sendDeactivationMail($user);
-                $this->updateEmailVerifiedAtColumn($user);
-                $user->delete();
-                DB::commit();
-                if($this->checkURL())
-                {
-                    return redirect()->back()->with('success', 'Successfuly deactivated');
-                }
-                else {
-                    return "success";
-                }
-            } catch (\Exception $e) {
-                DB::rollback();
-                if($this->checkURL())
-                {
-                    return redirect()->back()->with('error', 'not deactivated');
-                }
-                else {
-                    return "error";
-                }
-            }
 
-
-        } else {
-
-        }
-    }
 
     public function checkURL()
     {
@@ -232,10 +196,7 @@ class UserController extends Controller
         }
     }
 
-    public function sendDeactivationMail($user)
-    {
-        Mail::to($user->email)->send(new UserDeactivateMail($user));
-    }
+
 
     public function updateEmailVerifiedAtColumn($user)
     {
@@ -255,7 +216,7 @@ class UserController extends Controller
             $users = User::whereType('editor')->orWhere('type', 'chief editor')->orderBy('name', 'ASC')->get();
             $users = $this->attachField($users);
             $users = $this->userNameCapitalize($users);
-            $users = $this->attachNumber($users);
+            $users = $this->attachIncreamentingNumber($users);
             return $users;
         }
     }
@@ -276,7 +237,7 @@ class UserController extends Controller
         return $users;
     }
 
-    public function attachNumber($users)
+    public function attachIncreamentingNumber($users)
     {
         $count = 1;
         foreach ($users as $user) {
@@ -284,33 +245,4 @@ class UserController extends Controller
         }
         return $users;
     }
-
-    public function activateAccount($id)
-    {
-        if(\Gate::allows('isAdmin'))
-        {
-            $user = User::onlyTrashed()->findOrFail($id);
-            try {
-                $user->restore();
-                $this->createEventToSendEmailVerification($user);
-                $this->sendUserDetailMail($user);
-                if($this->checkURL())
-                {
-                    return redirect()->back()->with('success', 'Successfuly activated');
-                }
-                return 'success';
-            } catch (\Exception $e) {
-                if($this->checkURL())
-                {
-                    return redirect()->back()->with('error', 'not activated');
-                }
-                return 'error';
-            }
-
-        }
-        else {
-
-        }
-    }
-
 }

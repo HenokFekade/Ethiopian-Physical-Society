@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
-use App\Mail\AdminConfirmationMail;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\UserActivateMail;
+use App\Mail\UserDeactivateMail;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\DB;
 
 class AccountController extends Controller
 {
@@ -24,23 +26,30 @@ class AccountController extends Controller
     {
         $this->validater($request);
         $oldEmail = auth()->user()->email;
-        auth()->user()->update([
-            'name' => $request->name,
-            'email' => $request->email,
-        ]);
-        if(!empty($request->password))
-        {
+        DB::beginTransaction();
+        try {
             auth()->user()->update([
-                'password' => \Hash::make($request->password),
+                'name' => strtolower($request->name),
+                'email' => $request->email,
             ]);
-        }
-        if(auth()->user()->email != $oldEmail)
-        {
-          $this->updateEmailVerifiedAtColumn();
-          $this->createEventToSendEmailVerification();
+            if(!empty($request->password))
+            {
+                auth()->user()->update([
+                    'password' => \Hash::make($request->password),
+                ]);
+            }
+            if(auth()->user()->email != $oldEmail)
+            {
+              $this->updateEmailVerifiedAtColumn(auth()->user());
+              $this->createEventToSendEmailVerification();
 
+            }
+            DB::commit();
+            return redirect('/home')->with('status', 'account updated');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('status', 'something went wrong');
         }
-        return redirect('/home')->with('status', 'account updated');
     }
 
     public function validater($data)
@@ -62,11 +71,64 @@ class AccountController extends Controller
           event(new Registered(auth()->user()));
     }
 
-    public function updateEmailVerifiedAtColumn()
+    public function updateEmailVerifiedAtColumn($user)
     {
-      auth()->user()->forceFill([
+      $user->forceFill([
         'email_verified_at' => null,
       ])->save();
+    }
+
+    public function activateAccount($id)
+    {
+
+        if(\Gate::allows('isAdmin'))
+        {
+            $user = User::onlyTrashed()->findOrFail($id);
+            DB::beginTransaction();
+
+                $user->restore();
+                $this->updateEmailVerifiedAtColumn($user);
+                $this->sendActivatedMail($user);
+                DB::commit();
+                return "success";
+
+
+        }
+        else {
+
+        }
+    }
+
+
+    public function sendActivatedMail($user)
+    {
+      Mail::to($user->email)->send(new UserActivateMail($user));
+    }
+
+    public function deactivateAccount($id)
+    {
+        $user = User::findOrFail($id);
+        if (\Gate::allows('isAdmin')) {
+                DB::beginTransaction();
+                try {
+                    $user->delete();
+                    $this->updateEmailVerifiedAtColumn($user);
+                    $this->sendDeactivationMail($user);
+                    DB::commit();
+                    return "success";
+                } catch (\Exception $e) {
+                    DB::rollback();
+                    return "error";
+                }
+
+        } else {
+
+        }
+    }
+
+    public function sendDeactivationMail($user)
+    {
+        Mail::to($user->email)->send(new UserDeactivateMail($user));
     }
 
 }
