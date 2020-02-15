@@ -14,4 +14,9 @@ class Field extends Model
     {
         return $this->belongsToMany(User::class);
     }
+
+    public function files()
+    {
+        return $this->hasMany(File::class);
+    }
 }

@@ -35,6 +35,8 @@ Auth::routes(['verify' => true]);
 
 Route::get('/home', 'HomeController@index')->name('home')->middleware('verified');
 
+Route::resource('files', 'FileController');
+
 
 View::composer(['welcome', 'admin.user.create', 'admin.user.edit'], function ($view) {
     $fields = App\Field::orderBy('name', 'ASC')->get();

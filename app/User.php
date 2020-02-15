@@ -46,4 +46,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsToMany(Field::class);
     }
+
+    public function files()
+    {
+        return $this->belongsToMany(File::class)->withPivot('seen')->withPivot('replied')->withPivot('rejected')->withTimestamp()->orderBy('id', 'DESC');
+    }
 }

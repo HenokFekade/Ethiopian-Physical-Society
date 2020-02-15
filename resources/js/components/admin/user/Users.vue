@@ -183,7 +183,7 @@
                             showConfirmButton: false,
                             timer: 1500
                         });
-                        this.$Progress.finish();
+                        this.$Progress.finish()
                         Fire.$emit('loadUser');
                     }
                     else if (data == "error") {
