@@ -16,7 +16,7 @@
 
         <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     </head>
-    <body class="hold-transition sidebar-mini layout-fixed" >
+    @yield('body')    
         <div id="app" class="wrapper">
 
             <!-- Navbar -->

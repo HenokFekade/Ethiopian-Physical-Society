@@ -172,7 +172,7 @@
 
             createUser() {
                 this.$Progress.start();
-                this.form.post('users').then((data) => {
+                this.form.post('users').then(({data}) => {
                     this.form.reset();
                     $('#userModal').modal('hide');
                     if (data == "success") {

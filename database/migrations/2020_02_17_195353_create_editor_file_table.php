@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateFileUserTable extends Migration
+class CreateEditorFileTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,15 @@ class CreateFileUserTable extends Migration
      */
     public function up()
     {
-        Schema::create('file_user', function (Blueprint $table) {
+        Schema::create('editor_file', function (Blueprint $table) {
             $table->unsignedBigInteger('file_id');
             $table->unsignedBigInteger('user_id');
-            $table->boolean('seen')->default(false);
-            $table->boolean('rejected')->default(false);
-            $table->boolean('replied')->default(false);
+            $table->boolean('sended_to_researcher')->default(false);
             $table->timestamps();
 
             $table->primary(['file_id', 'user_id']);
+            $table->foreign('file_id')->references('id')->on('files')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -32,6 +32,6 @@ class CreateFileUserTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('file_user');
+        Schema::dropIfExists('editor_file');
     }
 }

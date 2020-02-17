@@ -1,5 +1,14 @@
 @extends('layouts.editorApp')
 
+@section('body')
+    @if (session('status'))
+        <body onload="fileDownload()" class="hold-transition sidebar-mini layout-fixed" >
+    @else
+        <body class="hold-transition sidebar-mini layout-fixed" >
+    @endif
+
+@endsection
+
 @section('user-image')
     <img src="img/profile/user.png" id="user-profile" class="img-circle elevation-2" alt="User Image">
 @endsection
@@ -31,23 +40,38 @@
                                                 <thead>
                                                     <tr>
                                                         <th style="width: 10px">#</th>
-                                                        <th>Name</th>
-                                                        <th>Email</th>
-                                                        <th>Type</th>
-                                                        <th>Status</th>
-                                                        <th>Modify</th>
+                                                        <th>File Name</th>
+                                                        <th>Download</th>
+                                                        <th>Reply</th>
+                                                        <th>Reject</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     @foreach ($files as $file)
-                                                        <tr>
-                                                            <td>{{$count++}}</td>
-                                                            <td>{{ ucwords($file->name)}}</td>
-                                                            <td>
-                                                                <span class="text-success">active</span>
-                                                            </td>
-
-                                                        </tr>
+                                                        @if (!($file->pivot->replied))
+                                                            <tr >
+                                                            <td>{{ $count++}}</td>
+                                                                <td>{{ $file->original_name }}</td>
+                                                                <td>
+                                                                    <a href="/file/download/{{$file->id}}"  class="blue"> download <i class="nav-icon fas fa-download fw  blue"></i></a>
+                                                                </td>
+                                                                <td>
+                                                                    <a href="/file/reply/{{$file->id}}" class="green" > reply <i class="nav-icon fas fa-reply fw  green"></i></a>
+                                                                </td>
+                                                                <td>
+                                                                    {{-- <reject file-id={{$file->id}}> </reject> --}}
+                                                                </td>
+                                                                @if (!($file->pivot->seen))
+                                                                    <td>
+                                                                        <span class="right badge badge-danger">New</span>
+                                                                    </td>
+                                                                @else
+                                                                    <td>
+                                                                        <span class="right badge badge-success">Seen</span>
+                                                                    </td>
+                                                                @endif
+                                                            </tr>
+                                                        @endif
                                                     @endforeach
                                                 </tbody>
                                             </table>
@@ -65,9 +89,16 @@
                 </div>
             </section>
         </div>
-
-@endsection
-
-@section('script')
-
-@endsection
+    @endsection
+    <script>
+        function fileDownload() {
+            if(true)
+            {
+                Swal.fire(
+                        'Download!',
+                        'File Not Found.',
+                        'error'
+                    );
+            }
+        }
+    </script>

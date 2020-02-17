@@ -2335,7 +2335,9 @@ __webpack_require__.r(__webpack_exports__);
       var _this3 = this;
 
       this.$Progress.start();
-      this.form.post('users').then(function (data) {
+      this.form.post('users').then(function (_ref3) {
+        var data = _ref3.data;
+
         _this3.form.reset();
 
         $('#userModal').modal('hide');
@@ -2379,8 +2381,8 @@ __webpack_require__.r(__webpack_exports__);
       var _this4 = this;
 
       this.$Progress.start();
-      this.form.put('users/' + this.form.id).then(function (_ref3) {
-        var data = _ref3.data;
+      this.form.put('users/' + this.form.id).then(function (_ref4) {
+        var data = _ref4.data;
 
         _this4.form.reset();
 
@@ -2437,8 +2439,8 @@ __webpack_require__.r(__webpack_exports__);
         if (result.value) {
           _this5.$Progress.start();
 
-          axios.get('account/account-deactivate/' + id).then(function (_ref4) {
-            var data = _ref4.data;
+          axios.get('account/account-deactivate/' + id).then(function (_ref5) {
+            var data = _ref5.data;
 
             if (data == "success") {
               Swal.fire('Deactivate!', 'The Account Have been Deactivated.', 'success');

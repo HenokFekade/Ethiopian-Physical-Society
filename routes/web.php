@@ -35,7 +35,13 @@ Auth::routes(['verify' => true]);
 
 Route::get('/home', 'HomeController@index')->name('home')->middleware('verified');
 
-Route::resource('files', 'FileController');
+Route::post('files', 'FileController@store');
+
+Route::get('file/download/{file}', 'FileController@download')->middleware('verified');
+
+Route::get('file/reply/{file}', 'FileController@createReply')->middleware('verified');
+
+Route::put('file/reply/{file}', 'FileController@storeReply')->middleware('verified');
 
 
 View::composer(['welcome', 'admin.user.create', 'admin.user.edit'], function ($view) {
