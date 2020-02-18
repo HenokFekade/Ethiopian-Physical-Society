@@ -43,6 +43,7 @@ Route::get('file/reply/{file}', 'FileController@createReply')->middleware('verif
 
 Route::put('file/reply/{file}', 'FileController@storeReply')->middleware('verified');
 
+Route::get('file/reject/{file}', 'FileController@rejectFile')->middleware('verified');
 
 View::composer(['welcome', 'admin.user.create', 'admin.user.edit'], function ($view) {
     $fields = App\Field::orderBy('name', 'ASC')->get();

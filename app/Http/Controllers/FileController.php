@@ -158,5 +158,34 @@ class FileController extends Controller
         }
     }
 
+    public function rejectFile(File $file)
+    {
+        if(\Gate::authorize('isEditor'))
+        {
+            DB::beginTransaction();
+            try {
+                File::create([
+                    'researcher_email' => 'user',
+                    'original_name' => 'rejected',
+                    'path' => 'rejected',                
+                    'field_id' => $file->field_id,
+                    'is_user' => true,
+                ]);
+                EditorFile::create([
+                    'user_id' => auth()->user()->id,
+                    'file_id' => $file->id,
+                ]);
+                auth()->user()->files()->whereFileId('$file->id')->updateExistingPivot($file, array('seen' => true), false);
+                auth()->user()->files()->whereFileId('$file->id')->updateExistingPivot($file, array('rejected' => true), false);
+                auth()->user()->files()->whereFileId('$file->id')->updateExistingPivot($file, array('replied' => true), false);
+                DB::commit();
+                return "success";
+            } catch (\Exception $e) {
+                DB::rollback();
+                return 'error';
+            }
+        }
+    }
+
 
 }

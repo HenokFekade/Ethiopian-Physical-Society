@@ -59,7 +59,7 @@
                                                                     <a href="/file/reply/{{$file->id}}" class="green" > reply <i class="nav-icon fas fa-reply fw  green"></i></a>
                                                                 </td>
                                                                 <td>
-                                                                    {{-- <reject file-id={{$file->id}}> </reject> --}}
+                                                                    <reject-file file-id={{$file->id}}> </reject-file>
                                                                 </td>
                                                                 @if (!($file->pivot->seen))
                                                                     <td>

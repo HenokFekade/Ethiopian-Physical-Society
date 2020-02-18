@@ -76,6 +76,7 @@ Vue.component('account-updated', require('./components/admin/AccountUpdated.vue'
 Vue.component('users', require('./components/admin/user/Users.vue').default);
 Vue.component('user-deactivated', require('./components/admin/user/UserDeactivated.vue').default);
 Vue.component('user-activated', require('./components/admin/user/UserActivated.vue').default);
+Vue.component('reject-file', require('./components/editor/Reject.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
